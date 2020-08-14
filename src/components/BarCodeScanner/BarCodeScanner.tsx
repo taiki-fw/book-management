@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Text, View, StyleSheet, Button, Image } from "react-native";
 import { BarCodeScanner } from "expo-barcode-scanner";
+import { Book } from "./Book/Book";
 
 export function BarCodeScannerContainer() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
@@ -27,6 +28,7 @@ export function BarCodeScannerContainer() {
       .then((json) => {
         if (!json.totalItems) {
           setStatus("上部のバーコードをスキャンしてください");
+          return;
         }
         setBookData(json.items[0]);
         setScanned(true);
@@ -54,13 +56,10 @@ export function BarCodeScannerContainer() {
           />
         </>
       ) : (
-        <View>
-          <Image
-            style={{ width: 128, height: 182 }}
-            source={{ uri: bookData.volumeInfo.imageLinks.thumbnail }}
-          />
-          <Text>{bookData.volumeInfo.title}</Text>
-        </View>
+        <Book
+          img={bookData.volumeInfo.imageLinks.thumbnail}
+          title={bookData.volumeInfo.title}
+        />
       )}
       {scanned && (
         <Button
