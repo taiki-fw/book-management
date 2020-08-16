@@ -7,7 +7,6 @@ export function BarCodeScannerContainer() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState<boolean>(false);
   const [bookData, setBookData] = useState(undefined);
-  const [status, setStatus] = useState<string>("");
 
   useEffect(() => {
     (async () => {
@@ -27,12 +26,10 @@ export function BarCodeScannerContainer() {
       .then((res) => res.json())
       .then((json) => {
         if (!json.totalItems) {
-          setStatus("上部のバーコードをスキャンしてください");
           return;
         }
         setBookData(json.items[0]);
         setScanned(true);
-        setStatus("Succeed!!");
       })
       .catch((error) => console.error(error));
   };
@@ -46,7 +43,6 @@ export function BarCodeScannerContainer() {
 
   return (
     <View>
-      <Text style={{ color: scanned ? "green" : "red" }}>{status}</Text>
       {bookData == undefined ? (
         <>
           <Text>上段のバーコードをかざしてください</Text>
