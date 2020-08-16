@@ -3,7 +3,45 @@ import { Text, View, StyleSheet, Button, Image } from "react-native";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import { Book } from "./Book/Book";
 
-export function BarCodeScannerContainer() {
+type Props = {
+  bookData: any;
+  setBookData: React.Dispatch<React.SetStateAction<undefined>>;
+  scanned: boolean;
+  setScanned: React.Dispatch<React.SetStateAction<boolean>>;
+  handleBarCodeScanned: ({ data }: { data: string }) => void;
+};
+
+const Component = (props: Props) => (
+  <View>
+    {props.bookData == undefined ? (
+      <>
+        <Text>上段のバーコードをかざしてください</Text>
+        <BarCodeScanner
+          style={{ width: 200, height: 100 }}
+          onBarCodeScanned={
+            props.scanned ? () => {} : props.handleBarCodeScanned
+          }
+        />
+      </>
+    ) : (
+      <Book
+        img={props.bookData.volumeInfo.imageLinks.thumbnail}
+        title={props.bookData.volumeInfo.title}
+      />
+    )}
+    {props.scanned && (
+      <Button
+        title={"Tap to Scan Again"}
+        onPress={() => {
+          props.setBookData(undefined);
+          props.setScanned(false);
+        }}
+      />
+    )}
+  </View>
+);
+
+export const BarCodeScannerContainer = () => {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState<boolean>(false);
   const [bookData, setBookData] = useState(undefined);
@@ -42,30 +80,12 @@ export function BarCodeScannerContainer() {
   }
 
   return (
-    <View>
-      {bookData == undefined ? (
-        <>
-          <Text>上段のバーコードをかざしてください</Text>
-          <BarCodeScanner
-            style={{ width: 200, height: 100 }}
-            onBarCodeScanned={scanned ? () => {} : handleBarCodeScanned}
-          />
-        </>
-      ) : (
-        <Book
-          img={bookData.volumeInfo.imageLinks.thumbnail}
-          title={bookData.volumeInfo.title}
-        />
-      )}
-      {scanned && (
-        <Button
-          title={"Tap to Scan Again"}
-          onPress={() => {
-            setBookData(undefined);
-            setScanned(false);
-          }}
-        />
-      )}
-    </View>
+    <Component
+      bookData={bookData}
+      setBookData={setBookData}
+      scanned={scanned}
+      setScanned={setScanned}
+      handleBarCodeScanned={handleBarCodeScanned}
+    />
   );
-}
+};
